@@ -161,8 +161,9 @@ io.sockets.on('connection', function (socket) {
 								socket_id: socket.id
 							};
 				delete players[socket.id];
-				io.in(room).emit('player_disconnected', payload);
+				io.in(room).emit('player_disconnected',payload);
 				}
+		
 		});
 
 /* send_message command */
@@ -305,7 +306,7 @@ io.sockets.on('connection', function (socket) {
 		}
 
 		var room = players[socket.id].room;
-		var roomObject = io.socket.adapter.rooms[room];
+		var roomObject = io.sockets.adapter.rooms[room];
 		/* Make sure the user being invited is in the room */
 		if(!roomObject.sockets.hasOwnProperty(requested_user)){
 			var error_message = 'invite requested a user that wasn\'t in the room, command aborted';
@@ -334,6 +335,7 @@ io.sockets.on('connection', function (socket) {
 		socket.to(requested_user).emit('invited', success_data);
 		
 		log('invite successful');
+
 		});
 
 });

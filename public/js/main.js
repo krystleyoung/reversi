@@ -58,7 +58,7 @@ socket.on('join_room_response',function(payload){
 		nodeA.addClass('w-100');
 		
 		nodeB.addClass('col-9 text-right');
-		nodeB.append('<h4>'+payload.username+'</h4>')
+		nodeB.append('<h4>'+payload.username+'</h4>');
 
 		nodeC.addClass('col-3 text-left');
 		var buttonC = makeInviteButton(payload.socket_id);
@@ -119,8 +119,9 @@ socket.on('player_disconnected',function(payload){
 function invite(who){
 	var payload = {};
 	payload.requested_user = who;
+
 	console.log('*** Client Log Message: \'invite\' payload: '+JSON.stringify(payload));
-	socket.emit('invite', payload);
+	socket.emit('invite',payload);
 }
 
 socket.on('invite_response',function(payload){
@@ -165,6 +166,7 @@ function makeInviteButton(socket_id){
 	newNode.click(function(){
 		invite(socket_id);
 	});
+	
 	return(newNode);
 }
 
