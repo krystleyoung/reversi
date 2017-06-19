@@ -320,6 +320,7 @@ else {
 }
 
 $('#my_color').html('<h3 id="my_color">I think we should colonize '+my_color+'</h3>');
+$('#my_color').append('<h4>It is ' +payload.game.whose_turn+'\'s turn.</h4>');
 
 /* Animate changes to the board */
 
