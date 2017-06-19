@@ -217,7 +217,7 @@ socket.on('send_message_response',function(payload){
 		return;
 	}
 
-	var newHTML = ('<p><b>'+payload.username+' says:</b> '+payload.message+'</p>');
+	var newHTML = '<p><b>'+payload.username+' says:</b> '+payload.message+'</p>';
 	var newNode = $(newHTML);
 	newNode.hide();
 	$('#messages').prepend(newNode);
@@ -268,7 +268,7 @@ $(function(){
 	console.log('***Client Log Message: \'join room\' payload: '+JSON.stringify(payload));
 	socket.emit('join_room',payload);
 
-	$('#quit').append('<a href=lobby.html?username='+username+'" class="btn btn-danger btn-default active" role="button" aria-pressed="true">Abort mission!</a>');
+	$('#quit').append('<a href="lobby.html?username='+username+'" class="btn btn-danger btn-default active" role="button" aria-pressed="true">Abort mission!</a>');
 
 
 });
@@ -276,14 +276,14 @@ $(function(){
 
 /* Code for the board specifically */
 var old_board = [
-					['?','?','?','?','?','?','?','?',],
-					['?','?','?','?','?','?','?','?',],
-					['?','?','?','?','?','?','?','?',],
-					['?','?','?','?','?','?','?','?',],
-					['?','?','?','?','?','?','?','?',],
-					['?','?','?','?','?','?','?','?',],
-					['?','?','?','?','?','?','?','?',],
-					['?','?','?','?','?','?','?','?',]
+					['?','?','?','?','?','?','?','?'],
+					['?','?','?','?','?','?','?','?'],
+					['?','?','?','?','?','?','?','?'],
+					['?','?','?','?','?','?','?','?'],
+					['?','?','?','?','?','?','?','?'],
+					['?','?','?','?','?','?','?','?'],
+					['?','?','?','?','?','?','?','?'],
+					['?','?','?','?','?','?','?','?']
 				];
 
 var my_color = ' ';
@@ -364,10 +364,14 @@ for(row = 0; row < 8; row++){
 			else{
 				$('#'+row+'_'+column).html('<img src="assets/images/error.gif" alt="error"/>');
 			}
-			/* Set up interactivity */
+		}
 
-			$('#'+row+'_'+column).off('click');
-			if(board[row][column] == ' '){
+		/* Set up interactivity */
+		$('#'+row+'_'+column).off('click');
+		$('#'+row+'_'+column).removeClass('hovered_over');
+
+		if(payload.game.whose_turn === my_color){
+			if(payload.game.legal_moves[row][column] === my_color.substr(0,1)){
 				$('#'+row+'_'+column).addClass('hovered_over');
 				$('#'+row+'_'+column).click(function(r,c){
 					return function(){
@@ -379,9 +383,6 @@ for(row = 0; row < 8; row++){
 						socket.emit('play_token',payload);
 					};
 				}(row,column));
-			}
-			else{
-				$('#'+row+'_'+column).removeClass('hovered_over');
 			}
 		}
 	}

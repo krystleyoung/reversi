@@ -64,7 +64,7 @@ io.sockets.on('connection', function (socket) {
 			'result': 'success',
 			'room': room joined,
 			'username': username that joined,
-			'socket_id': the socket id of the person that,
+			'socket_id': the socket id of the person that joined,
 			'membership': number of people in the room including the new one
 		}
 		or
@@ -149,7 +149,7 @@ io.sockets.on('connection', function (socket) {
 		log('join_room success');
 		
 		if(room !== 'lobby'){
-			send_game_update(socket,room,'intial update');
+			send_game_update(socket,room,'initial update');
 		}
 	});
 
@@ -212,7 +212,7 @@ io.sockets.on('connection', function (socket) {
 			return;
 		}
 
-		var username = payload.username;
+		var username = players[socket.id].username;
 		if(('undefined' === typeof username) || !username){
 			var error_message = 'send_message didn\'t specify a username,  command aborted';
 			log(error_message);
@@ -241,7 +241,7 @@ io.sockets.on('connection', function (socket) {
 													message: message
 							};
 
-		io.sockets.in(room).emit('send_message_response',success_data);
+		io.in(room).emit('send_message_response',success_data);
 		log('Message sent to room ' + room + ' by ' + username);
 		});
 
@@ -302,7 +302,7 @@ io.sockets.on('connection', function (socket) {
 		if(('undefined' === typeof requested_user) || !requested_user){
 			var error_message = 'invite didn\'t specify a requested_user, command aborted';
 			log(error_message);
-			socket.emit('send_invite_response',	{
+			socket.emit('invite_response',	{
 													result: 'fail',
 													message: error_message
 												});
@@ -411,9 +411,9 @@ io.sockets.on('connection', function (socket) {
 		var roomObject = io.sockets.adapter.rooms[room];
 		/* Make sure the user being invited is in the room */
 		if(!roomObject.sockets.hasOwnProperty(requested_user)){
-			var error_message = 'invite requested a user that wasn\'t in the room, command aborted';
+			var error_message = 'uninvite requested a user that wasn\'t in the room, command aborted';
 			log(error_message);
-			socket.emit('invite_response',	{
+			socket.emit('uninvite_response',	{
 													result: 'fail',
 													message: error_message
 												});
@@ -577,7 +577,7 @@ io.sockets.on('connection', function (socket) {
 		}
 
 		var username = players[socket.id].username;
-		if(('undefined' === typeof player) || !player){
+		if(('undefined' === typeof username) || !username){
 			var error_message = 'play_token can\'t identify who sent the message';
 			log(error_message);
 			socket.emit('play_token_response',	{
@@ -694,17 +694,17 @@ function create_new_game(){
 	var d = new Date();
 	new_game.last_move_time = d.getTime();
 
-	new_game.whose_turn = 'white';
+	new_game.whose_turn = 'black';
 
 	new_game.board = [
-						[' ',' ',' ',' ',' ',' ',' ',' ', ],
-						[' ',' ',' ',' ',' ',' ',' ',' ', ],
-						[' ',' ',' ',' ',' ',' ',' ',' ', ],
-						[' ',' ',' ','w','b',' ',' ',' ', ],
-						[' ',' ',' ','b','w',' ',' ',' ', ],
-						[' ',' ',' ',' ',' ',' ',' ',' ', ],
-						[' ',' ',' ',' ',' ',' ',' ',' ', ],
-						[' ',' ',' ',' ',' ',' ',' ',' ', ]
+						[' ',' ',' ',' ',' ',' ',' ',' ' ],
+						[' ',' ',' ',' ',' ',' ',' ',' ' ],
+						[' ',' ',' ',' ',' ',' ',' ',' ' ],
+						[' ',' ',' ','w','b',' ',' ',' ' ],
+						[' ',' ',' ','b','w',' ',' ',' ' ],
+						[' ',' ',' ',' ',' ',' ',' ',' ' ],
+						[' ',' ',' ',' ',' ',' ',' ',' ' ],
+						[' ',' ',' ',' ',' ',' ',' ',' ' ]
 					];
 	new_game.legal_moves = calculate_valid_moves('b',new_game.board);
 	
@@ -728,7 +728,7 @@ function create_new_game(){
  	if( (c+dc < 0) || (c+dc > 7) ){
  		return false;
  	}
- 	return check_line_match(who,dr,dc,r+dr,c+dc,board)
+ 	return check_line_match(who,dr,dc,r+dr,c+dc,board);
  }
 
 /* Check if the position at r,c contains the opposite of 'who' on the board
@@ -769,14 +769,14 @@ function create_new_game(){
 
 function calculate_valid_moves(who,board){
 	var valid = [
-						[' ',' ',' ',' ',' ',' ',' ',' ', ],
-						[' ',' ',' ',' ',' ',' ',' ',' ', ],
-						[' ',' ',' ',' ',' ',' ',' ',' ', ],
-						[' ',' ',' ',' ',' ',' ',' ',' ', ],
-						[' ',' ',' ',' ',' ',' ',' ',' ', ],
-						[' ',' ',' ',' ',' ',' ',' ',' ', ],
-						[' ',' ',' ',' ',' ',' ',' ',' ', ],
-						[' ',' ',' ',' ',' ',' ',' ',' ', ]
+						[' ',' ',' ',' ',' ',' ',' ',' ' ],
+						[' ',' ',' ',' ',' ',' ',' ',' ' ],
+						[' ',' ',' ',' ',' ',' ',' ',' ' ],
+						[' ',' ',' ',' ',' ',' ',' ',' ' ],
+						[' ',' ',' ',' ',' ',' ',' ',' ' ],
+						[' ',' ',' ',' ',' ',' ',' ',' ' ],
+						[' ',' ',' ',' ',' ',' ',' ',' ' ],
+						[' ',' ',' ',' ',' ',' ',' ',' ' ]
 					];
 	for(var row = 0; row < 8;row++){
 		for(var column = 0; column < 8;column++){
@@ -822,15 +822,15 @@ function send_game_update(socket, game_id, message){
 		if(numClients > 2){
 			console.log('Too many clients in room: '+game_id+' #: '+numClients);
 			if(games[game_id].player_white.socket == roomObject.sockets[0]){
-				games[game_id].player_white.socket_id = '';
+				games[game_id].player_white.socket = '';
 				games[game_id].player_white.username = '';
 			}
 			if(games[game_id].player_black.socket == roomObject.sockets[0]){
-				games[game_id].player_black.socket_id = '';
+				games[game_id].player_black.socket = '';
 				games[game_id].player_black.username = '';
 			}
 			/* Kick one of the extra people out */
-			var sacrifice = Object.keys(roomObject.sockets)[0];
+			var sacrifice = object.keys(roomObject.sockets)[0];
 			io.of('/').connected[sacrifice].leave(game_id);
 
 		}
