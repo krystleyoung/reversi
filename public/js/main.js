@@ -268,7 +268,7 @@ $(function(){
 	console.log('***Client Log Message: \'join room\' payload: '+JSON.stringify(payload));
 	socket.emit('join_room',payload);
 
-	$('#quit').append('<a href=lobby.html?username='+username+'" class="btn btn-danger btn-default active" role="button" aria-pressed="true">Abort</a>');
+	$('#quit').append('<a href=lobby.html?username='+username+'" class="btn btn-danger btn-default active" role="button" aria-pressed="true">Abort mission!</a>');
 
 
 });
